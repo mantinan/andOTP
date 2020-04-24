@@ -2,6 +2,7 @@
 <resources>
     <!-- Keys -->
     <string name="settings_key_cat_security" translatable="false">pref_cat_security</string>
+    <string name="settings_key_cat_backup" translatable="false">pref_cat_backup</string>
 
     <string name="settings_key_tap_to_reveal" translatable="false">pref_tap_to_reveal</string>
     <string name="settings_key_tap_to_reveal_timeout" translatable="false">pref_tap_to_reveal_timeout</string>
@@ -38,7 +39,8 @@
 
     <string name="settings_key_backup_append_date_time" translatable="false">pref_backup_append_date_time</string>
     <string name="settings_key_backup_ask" translatable="false">pref_backup_ask</string>
-    <string name="settings_key_backup_directory" translatable="false">pref_backup_directory</string>
+    <string name="settings_key_backup_directory" translatable="false">pref_backup_directory</string>    <!-- Deprecated -->
+    <string name="settings_key_backup_location" translatable="false">pref_backup_location</string>
     <string name="settings_key_backup_password" translatable="false">pref_backup_password</string>    <!-- Deprecated -->
     <string name="settings_key_backup_password_enc" translatable="false">pref_backup_password_enc</string>
     <string name="settings_key_auto_backup_password_enc" translatable="false">pref_backup_auto_password_enc</string>

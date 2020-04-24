@@ -82,6 +82,7 @@ public class Constants {
     public final static int INTENT_BACKUP_OPEN_DOCUMENT_CRYPT_OLD   = 208;
 
     public static final int INTENT_SETTINGS_AUTHENTICATE        = 300;
+    public static final int INTENT_SETTINGS_BACKUP_LOCATION     = 301;
 
     // Permission requests (Format: A1x with A = parent Activity, x = number of the request)
     public final static int PERMISSIONS_MAIN_QR_READ_IMAGE              = 111;

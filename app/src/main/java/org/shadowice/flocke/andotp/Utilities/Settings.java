@@ -24,6 +24,7 @@ package org.shadowice.flocke.andotp.Utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 
@@ -586,5 +587,17 @@ public class Settings {
 
     public boolean isShowIndividualTimeoutsEnabled() {
         return getBoolean(R.string.settings_key_show_individual_timeouts, false);
+    }
+
+    public void setBackupLocation(Uri uri) {
+        setString(R.string.settings_key_backup_location, uri.toString());
+    }
+
+    public Uri getBackupLocation() {
+        return Uri.parse(getString(R.string.settings_key_backup_location, ""));
+    }
+
+    public boolean isBackupLocationSet() {
+        return !getString(R.string.settings_key_backup_location, "").isEmpty();
     }
 }

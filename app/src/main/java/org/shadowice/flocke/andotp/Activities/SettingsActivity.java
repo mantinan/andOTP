@@ -27,6 +27,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -37,6 +39,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import androidx.appcompat.widget.Toolbar;
 import android.view.ViewStub;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.openintents.openpgp.util.OpenPgpAppPreference;
@@ -215,6 +218,15 @@ public class SettingsActivity extends BaseActivity
         return false;
     }
 
+    private void requestBackupAccess() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        startActivityForResult(intent, Constants.INTENT_SETTINGS_BACKUP_LOCATION);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -233,6 +245,13 @@ public class SettingsActivity extends BaseActivity
             } else {
                 Toast.makeText(this, R.string.settings_toast_encryption_auth_failed, Toast.LENGTH_LONG).show();
             }
+        } else if (requestCode == Constants.INTENT_SETTINGS_BACKUP_LOCATION && resultCode == RESULT_OK) {
+            Uri treeUri = data.getData();
+            if (treeUri != null) {
+                final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+                settings.setBackupLocation(treeUri);
+            }
         } else if (fragment.pgpSigningKey.handleOnActivityResult(requestCode, resultCode, data)) {
             // handled by OpenPgpKeyPreference
             return;
@@ -241,11 +260,14 @@ public class SettingsActivity extends BaseActivity
 
     public static class SettingsFragment extends PreferenceFragment {
         PreferenceCategory catSecurity;
+        PreferenceCategory catBackup;
 
         Settings settings;
         ListPreference encryption;
         ListPreference useAutoBackup;
         CheckBoxPreference useAndroidSync;
+        EditTextPreference backupDirectory;
+        Preference backupLocation;
 
         OpenPgpAppPreference pgpProvider;
         EditTextPreference pgpEncryptionKey;
@@ -324,6 +346,31 @@ public class SettingsActivity extends BaseActivity
                     return false;
                 }
             });
+
+            catBackup = (PreferenceCategory) findPreference(getString(R.string.settings_key_cat_backup));
+
+            backupDirectory = (EditTextPreference) findPreference(getString(R.string.settings_key_backup_directory));
+            backupLocation = findPreference(getString(R.string.settings_key_backup_location));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                catBackup.removePreference(backupDirectory);
+
+                if (settings.isBackupLocationSet()) {
+                    backupLocation.setSummary(R.string.settings_desc_backup_location_set);
+                } else {
+                    backupLocation.setSummary(R.string.settings_desc_backup_location);
+                }
+
+                backupLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        ((SettingsActivity) getActivity()).requestBackupAccess();
+                        return true;
+                    }
+                });
+            } else {
+                catBackup.removePreference(backupLocation);
+            }
 
             // OpenPGP
             pgpProvider = (OpenPgpAppPreference) findPreference(getString(R.string.settings_key_openpgp_provider));
