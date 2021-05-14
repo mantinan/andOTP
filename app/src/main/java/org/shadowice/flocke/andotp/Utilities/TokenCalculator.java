@@ -137,7 +137,9 @@ public class TokenCalculator {
             byte[] messageDigest = digest.digest();
 
             // Create Hex String
-            String hexString = Hex.encodeHexString(messageDigest);
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < messageDigest.length; i++)
+                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
             otp = hexString.substring(0, 6);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
